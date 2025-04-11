@@ -1372,6 +1372,10 @@ void I_UpdateVideoMode(void)
   if (V_GetMode() == VID_MODEGL)
   {
 #ifdef GL_DOOM
+#ifdef __EMSCRIPTEN__
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+#endif // __EMSCRIPTEN__
+
     SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 0 );
     SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 0 );
     SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 0 );
@@ -1407,6 +1411,10 @@ void I_UpdateVideoMode(void)
 
     if (render_vsync && !novsync)
       flags |= SDL_RENDERER_PRESENTVSYNC;
+
+#ifdef __EMSCRIPTEN__
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
+#endif // __EMSCRIPTEN__
 
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
