@@ -16,9 +16,6 @@ RUN apt-get update \
 		libsdl2-dev \
 	&& rm -rf /var/lib/apt/lists/*
 
-WORKDIR /src
-COPY . .
-
 # Build GL4ES for Emscripten (provides OpenGL->GLES translation used by this project).
 # Source: https://ptitseb.github.io/gl4es/COMPILE.html
 ARG GL4ES_REPO=https://github.com/ptitSeb/gl4es.git
@@ -38,6 +35,9 @@ RUN git clone --depth 1 --branch "${GL4ES_REF}" "${GL4ES_REPO}" /tmp/gl4es \
 	&& test -n "${GL4ES_LIB}" \
 	&& cp -a "${GL4ES_LIB}" /opt/gl4es/lib/libGL.a \
 	&& rm -rf /tmp/gl4es
+
+WORKDIR /src
+COPY . .
 
 # 1) Generate prboomx.wad (required by the WebAssembly build). This is done via the
 #    native build because the rdatawad tool isn't built when cross-compiling.
