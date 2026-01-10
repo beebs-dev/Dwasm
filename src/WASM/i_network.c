@@ -31,6 +31,8 @@
 // Include it after Doom headers to avoid colliding with doomtype.h's dboolean.
 #include <emscripten.h>
 
+#include "lprintf.h"
+
 #ifndef PRBOOM_SERVER
 extern void I_AtExit(void (*func)(void), dboolean run_if_error);
 #endif
@@ -52,6 +54,12 @@ typedef struct {
 static wasm_net_pkt_t rxq[WASM_NET_QUEUE_LEN];
 static int rxq_head;
 static int rxq_tail;
+
+static unsigned long wasm_net_rx_ok;
+static unsigned long wasm_net_rx_bad_checksum;
+static unsigned long wasm_net_rx_dropped_full;
+static double wasm_net_last_bad_log_ms;
+static double wasm_net_last_ok_log_ms;
 
 static unsigned char *rx_scratch;
 static int rx_scratch_cap;
@@ -76,6 +84,7 @@ static void rxq_push_bytes(const unsigned char *data, int len)
 
   if (rxq_is_full()) {
     // Drop when full (UDP semantics).
+    wasm_net_rx_dropped_full++;
     return;
   }
 
@@ -182,6 +191,11 @@ void I_ShutdownNetwork(void)
 void I_InitNetwork(void)
 {
   rxq_head = rxq_tail = 0;
+  wasm_net_rx_ok = 0;
+  wasm_net_rx_bad_checksum = 0;
+  wasm_net_rx_dropped_full = 0;
+  wasm_net_last_bad_log_ms = 0;
+  wasm_net_last_ok_log_ms = 0;
 #ifndef PRBOOM_SERVER
   // Best-effort cleanup when exiting.
   // (Browser builds usually won't truly exit, but keep parity.)
@@ -195,8 +209,14 @@ void I_InitNetwork(void)
 void I_WaitForPacket(int ms)
 {
   // In the browser we can't select() on sockets; just yield.
+#ifdef DWASM_ASYNCIFY
+  if (ms < 0)
+    ms = 0;
+  emscripten_sleep(ms);
+#else
   if (ms > 0)
     SDL_Delay((Uint32)ms);
+#endif
 }
 
 UDP_SOCKET I_Socket(Uint16 port)
@@ -230,6 +250,8 @@ size_t I_GetPacket(packet_header_t *buffer, size_t buflen)
 {
   int len;
   int checksum;
+  byte psum;
+  double now;
 
   if (!buffer || buflen == 0)
     return 0;
@@ -246,8 +268,28 @@ size_t I_GetPacket(packet_header_t *buffer, size_t buflen)
   buffer->checksum = 0;
 
   // Verify packet checksum like the SDL_net backend.
-  if (ChecksumPacket(buffer, (size_t)len) != (byte)checksum)
+  psum = ChecksumPacket(buffer, (size_t)len);
+  if (psum != (byte)checksum) {
+    wasm_net_rx_bad_checksum++;
+    now = emscripten_get_now();
+    if (now - wasm_net_last_bad_log_ms > 1000.0) {
+      wasm_net_last_bad_log_ms = now;
+      lprintf(LO_WARN,
+        "WASM net: dropped packet (bad checksum) len=%d type=%d want=%u got=%u ok=%lu bad=%lu dropfull=%lu\n",
+        len, (int)buffer->type, (unsigned)(byte)checksum, (unsigned)psum,
+        wasm_net_rx_ok, wasm_net_rx_bad_checksum, wasm_net_rx_dropped_full);
+    }
     return 0;
+  }
+
+  wasm_net_rx_ok++;
+  now = emscripten_get_now();
+  if (now - wasm_net_last_ok_log_ms > 2000.0) {
+    wasm_net_last_ok_log_ms = now;
+    lprintf(LO_INFO,
+      "WASM net: rx ok len=%d type=%d ok=%lu bad=%lu dropfull=%lu\n",
+      len, (int)buffer->type, wasm_net_rx_ok, wasm_net_rx_bad_checksum, wasm_net_rx_dropped_full);
+  }
 
   recvdbytes += (size_t)len;
   return (size_t)len;

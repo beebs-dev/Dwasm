@@ -225,6 +225,16 @@ Next, run these commands in the Dwasm folder.  Replace `/tmp/gl4es` with your GL
     emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DGL4ES_PATH=/tmp/gl4es
     make
 
+#### Better WASM crash stacks (de-obfuscation)
+
+By default, the WebAssembly build preserves function names so browser crash stacks are readable.
+
+For full browser source-level debugging (emits `index.js.map` and `index.wasm.map`), configure with:
+
+    emcmake cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWASM_SOURCE_MAPS=ON -DGL4ES_PATH=/tmp/gl4es
+
+If you serve the build via Docker/nginx, the Dockerfile copies `*.map` files when they exist.
+
 The process will output the following into the `build` folder:
 
     index.html

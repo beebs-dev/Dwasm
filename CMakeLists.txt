@@ -231,6 +231,49 @@ if (MSVC)
     add_definitions("/D_CRT_SECURE_NO_WARNINGS")
 else()
     if(EMSCRIPTEN)
+        option(WASM_KEEP_FUNCTION_NAMES "Keep function names in the WASM binary for readable stack traces" ON)
+        option(WASM_SOURCE_MAPS "Emit JS/WASM source maps for browser debugging (produces *.map files)" OFF)
+        # Emscripten removed -sDEMANGLE_SUPPORT; keep this option for compatibility,
+        # but default it OFF and do not emit the removed flag.
+        option(WASM_DEMANGLE_SUPPORT "(Deprecated) Demangle C++ symbol names in stack traces" OFF)
+        option(WASM_ASSERTIONS "Enable Emscripten runtime assertions (better error messages, bigger output)" ON)
+        option(WASM_ASYNCIFY "Enable Asyncify so sleep/yield works in the browser (required for WASM net startup waits)" ON)
+
+        set(WASM_DIAGNOSTIC_FLAGS "")
+        if(WASM_KEEP_FUNCTION_NAMES)
+            # Preserve function names in the WASM name section so stacks don't show $func####.
+            # Note: this must be passed to emcc/em++ ("-profiling-funcs"), not to wasm-ld.
+            set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -profiling-funcs")
+        endif()
+        if(WASM_SOURCE_MAPS)
+            # Emits index.js.map and index.wasm.map (must be hosted alongside the artifacts).
+            set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -gsource-map")
+            # Ensure we actually have line info to map.
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g3")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+        endif()
+        if(WASM_DEMANGLE_SUPPORT)
+            message(WARNING "WASM_DEMANGLE_SUPPORT requested, but -sDEMANGLE_SUPPORT is no longer supported by Emscripten; ignoring.")
+        endif()
+        if(WASM_ASSERTIONS)
+            # Use a lighter level in Release; make Debug/RelWithDebInfo more verbose.
+            if(CMAKE_BUILD_TYPE STREQUAL "Release")
+                set(WASM_ASSERTIONS_LEVEL 1)
+            else()
+                set(WASM_ASSERTIONS_LEVEL 2)
+            endif()
+            set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -sASSERTIONS=${WASM_ASSERTIONS_LEVEL}")
+        endif()
+
+        if(WASM_ASYNCIFY)
+            # Required so emscripten_sleep() can yield back to the browser event loop.
+            set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -sASYNCIFY")
+            add_definitions(-DDWASM_ASYNCIFY=1)
+        endif()
+
+        # Needed so shell.html can call Module.stackTrace() in onAbort.
+        set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -sEXPORTED_RUNTIME_METHODS=['stackTrace']")
+
         if (BUILD_GL AND GL4ES_PATH)
             set(CMAKE_C_FLAGS
                 "${CMAKE_C_FLAGS} \
@@ -263,6 +306,7 @@ else()
         set(CMAKE_EXE_LINKER_FLAGS
             "${CMAKE_EXE_LINKER_FLAGS} \
             ${SHARED_EMSCRIPTEN_FLAGS} \
+            ${WASM_DIAGNOSTIC_FLAGS} \
             -sEMULATE_FUNCTION_POINTER_CASTS=1 \
             -sFULL_ES2=1 \
             -sINITIAL_MEMORY=64MB \

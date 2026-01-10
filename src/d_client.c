@@ -114,11 +114,12 @@ void D_InitNetGame (void)
     packet_header_t *packet = Z_Malloc(1000, PU_STATIC, NULL);
     struct setup_packet_s *sinfo = (void*)(packet+1);
   struct { packet_header_t head; short pn; } PACKEDATTR initpacket;
-
+  lprintf(LO_INFO,"D_InitNetGame: Initializing network.\n");
     I_InitNetwork();
+  lprintf(LO_INFO,"D_InitNetGame: Connecting to server.\n");
   udp_socket = I_Socket(0);
   I_ConnectToServer(myargv[i]);
-
+  lprintf(LO_INFO,"D_InitNetGame: Connected to server.\n");
     do
     {
       do { 

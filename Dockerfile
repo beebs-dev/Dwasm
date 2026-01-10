@@ -66,6 +66,8 @@ RUN mkdir -p build \
 	&& cmake --build . -j"$(nproc)" \
 	&& mkdir -p /out \
 	&& cp -f index.html index.js index.data index.wasm /out/ \
+	&& (test -f index.js.map && cp -f index.js.map /out/ || true) \
+	&& (test -f index.wasm.map && cp -f index.wasm.map /out/ || true) \
 	&& curl -fsSL "https://unpkg.com/livekit-client@2.16.1/dist/livekit-client.umd.js" -o /out/livekit-client.umd.js
 
 # Export stage: use BuildKit output, e.g.

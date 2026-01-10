@@ -175,6 +175,69 @@
           }
         }
 
+        function findServerParticipant(room) {
+          if (!room || !room.remoteParticipants) return null;
+          try {
+            // remoteParticipants is a Map in LiveKit v2.
+            const it = room.remoteParticipants.values();
+            for (const p of it) {
+              if (!p) continue;
+              const ident = (p.identity !== undefined && p.identity !== null) ? String(p.identity) : '';
+              const name = (p.name !== undefined && p.name !== null) ? String(p.name) : '';
+              if (ident === 'server' || name === 'server') return p;
+            }
+          } catch (_) {
+            // Ignore; best-effort.
+          }
+          return null;
+        }
+
+        function publishUdp(room, bytes) {
+          const LK = getLiveKit();
+          if (!LK || !room || !room.localParticipant) return;
+
+          const serverP = findServerParticipant(room);
+          const dest = serverP && serverP.identity ? [String(serverP.identity)] : ['server'];
+
+          // Prefer the signature that most consistently supports `topic`:
+          //   publishData(data, { reliable, topic, destinationIdentities })
+          try {
+            room.localParticipant.publishData(bytes, {
+              reliable: false,
+              topic: 'udp',
+              destinationIdentities: dest,
+            });
+            return;
+          } catch (e) {
+            console.warn('publishData(data, options) failed; falling back:', e);
+          }
+
+          // Fallback for older/newer signatures:
+          //   publishData(data, kind, options)
+          try {
+            if (LK.DataPacket_Kind && LK.DataPacket_Kind.LOSSY !== undefined) {
+              room.localParticipant.publishData(bytes, LK.DataPacket_Kind.LOSSY, {
+                topic: 'udp',
+                destinationIdentities: dest,
+              });
+              return;
+            }
+          } catch (e) {
+            console.warn('publishData(data, kind, options) failed; falling back:', e);
+          }
+
+          // Last-resort fallback: broadcast lossy without topic.
+          try {
+            if (LK.DataPacket_Kind && LK.DataPacket_Kind.LOSSY !== undefined) {
+              room.localParticipant.publishData(bytes, LK.DataPacket_Kind.LOSSY);
+            } else {
+              room.localParticipant.publishData(bytes);
+            }
+          } catch (_) {
+            // Drop on error (UDP semantics).
+          }
+        }
+
         function getLiveKit() {
           return (typeof window !== 'undefined')
             ? (window.LiveKitClient || window.LivekitClient)
@@ -237,7 +300,30 @@
               });
 
               room
-                .on(LK.RoomEvent.DataReceived, (payload, participant, kind) => {
+                .on(LK.RoomEvent.DataReceived, (payload, participant, kind, topic) => {
+                  // Only accept datagrams from the participant named/identified as "server" on topic "udp".
+                  try {
+                    const ident = participant && participant.identity ? String(participant.identity) : '';
+                    const name = participant && participant.name ? String(participant.name) : '';
+                    const t = (topic !== undefined && topic !== null) ? String(topic) : '';
+
+                    // Topic must be exactly "udp".
+                    if (t !== 'udp') {
+                      console.warn('Dropping data on unexpected topic:', t);
+                      return;
+                    }
+
+                    // Sender must be the server participant.
+                    if (ident !== 'server' && name !== 'server') {
+                      console.warn('Dropping data from unexpected participant:', ident || name);
+                      return;
+                    }
+                  } catch (err) {
+                    // On any parse error, fail closed.
+                    console.error('DataReceived participant/topic parse failed', { err });
+                    return;
+                  }
+
                   // payload is a Uint8Array
                   deliverToWasm(payload);
                 })
@@ -295,9 +381,7 @@
               return;
             }
             try {
-              const LK = getLiveKit();
-              const kind = (LK && LK.DataPacket_Kind && LK.DataPacket_Kind.LOSSY) ? LK.DataPacket_Kind.LOSSY : 1;
-              state.room.localParticipant.publishData(payload, kind);
+              publishUdp(state.room, payload);
             } catch (e) {
               // Drop on error (UDP semantics).
             }
@@ -336,6 +420,29 @@
             outputElement.scrollTop = outputElement.scrollHeight; // focus on bottom
           };
         })(),
+        printErr: (function() {
+          return (...args) => {
+            var text = args.join(' ');
+            console.error(text);
+            outputElement.value += text + "\n";
+            outputElement.scrollTop = outputElement.scrollHeight;
+          };
+        })(),
+        onAbort: (what) => {
+          const msg = (what !== undefined && what !== null) ? String(what) : 'abort';
+          console.error('WASM abort:', msg);
+          try {
+            if (typeof Module.stackTrace === 'function') {
+              console.error('WASM stackTrace():\n' + Module.stackTrace());
+            }
+          } catch (e) {
+            console.warn('stackTrace() failed:', e);
+          }
+
+          // Keep the on-page status in sync with fatal errors.
+          Module.setStatus('WASM abort: ' + msg + ' (see console)');
+          spinnerElement.style.display = 'none';
+        },
         canvas: (() => {
           // As a default initial behavior, pop up an alert when webgl context is lost. To make your
           // application robust, you may want to override this behavior before shipping!
@@ -418,13 +525,31 @@
         arguments: computeModuleArgs()
       };
       Module.setStatus('Downloading...');
-      window.onerror = () => {
+
+      function reportFatalError(errLike, context = 'error') {
+        const msg = (errLike && (errLike.stack || errLike.message))
+          ? (errLike.stack || errLike.message)
+          : String(errLike);
+        console.error('Fatal ' + context + ':', msg);
+        try {
+          outputElement.value += ('Fatal ' + context + ': ' + msg + "\n");
+          outputElement.scrollTop = outputElement.scrollHeight;
+        } catch (_) {}
+
         Module.setStatus('Exception thrown, see JavaScript console');
         spinnerElement.style.display = 'none';
         Module.setStatus = (text) => {
           if (text) console.error('[post-exception status] ' + text);
         };
-      };
+      }
+
+      window.addEventListener('error', (event) => {
+        reportFatalError(event && (event.error || event.message), 'error');
+      });
+
+      window.addEventListener('unhandledrejection', (event) => {
+        reportFatalError(event && event.reason, 'unhandledrejection');
+      });
     </script>
     {{{ SCRIPT }}}
   </body>

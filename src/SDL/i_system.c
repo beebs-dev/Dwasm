@@ -99,11 +99,39 @@
 
 #include "m_io.h"
 
+#ifdef __EMSCRIPTEN__
+/*
+ * Do NOT include Emscripten headers here.
+ * <emscripten/em_js.h> defines true/false macros that conflict with
+ * doomtype.h's `typedef enum {false, true} dboolean;`.
+ */
+#ifdef DWASM_ASYNCIFY
+extern void emscripten_sleep(int ms);
+#endif
+#endif
+
 void I_uSleep(unsigned long usecs)
 {
-#ifndef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
+    /*
+     * In the browser, busy-spinning blocks the JS event loop, which prevents
+     * WebRTC/LiveKit callbacks from delivering packets during startup.
+     *
+     * When built with -sASYNCIFY (DWASM_ASYNCIFY), emscripten_sleep() yields
+     * control back to the browser so async events can run.
+     */
+#ifdef DWASM_ASYNCIFY
+    if (usecs >= 1000) {
+      emscripten_sleep((int)(usecs / 1000));
+    } else {
+      emscripten_sleep(0);
+    }
+#else
+    (void)usecs;
+#endif
+#else
     SDL_Delay(usecs/1000);
-#endif // !__EMSCRIPTEN__
+#endif
 }
 
 #ifndef PRBOOM_SERVER
