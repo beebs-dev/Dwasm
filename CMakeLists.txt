@@ -96,6 +96,11 @@ if(BUILD_GL)
 endif()
 
 if(EMSCRIPTEN)
+    # Enable networking in the game code for the browser build.
+    # We do NOT use SDL2_net in EMSCRIPTEN; instead we provide a WASM/WebRTC backend.
+    set(HAVE_NET TRUE)
+    set(USE_SDL_NET TRUE)
+
     set(SDL2_MIXER_FOUND TRUE)
     set(HAVE_LIBSDL2_MIXER TRUE)
 else()

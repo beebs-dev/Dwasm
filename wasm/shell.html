@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Dwasm</title>
+    <script src="https://unpkg.com/livekit-client/dist/livekit-client.umd.min.js"></script>
     <style>
       body {
         background-color: black;
@@ -85,8 +86,196 @@
       var canvasElement = document.getElementById('canvas');
       var outputElement = document.getElementById('output');
 
+      function computeModuleArgs() {
+        // Historically this project used `&` as argv separators.
+        const rawArgs = (window.location.search.length > 1)
+          ? window.location.search.substr(1).split('&').filter(Boolean)
+          : [];
+
+        // If ?g=<uuid> is present, auto-join that game by passing:
+        //   -net <uuid>
+        // into the engine. The engine will call I_ConnectToServer(<uuid>),
+        // which triggers the LiveKit join flow.
+        let gameId = null;
+        try {
+          gameId = new URLSearchParams(window.location.search).get('g');
+        } catch (_) {
+          gameId = null;
+        }
+
+        if (!gameId) {
+          return rawArgs;
+        }
+
+        // Drop any existing g=... token from the legacy raw args.
+        const filtered = rawArgs.filter((a) => !a.startsWith('g='));
+        filtered.push('-net', gameId);
+        return filtered;
+      }
+
+      // WebRTC transport implemented via LiveKit data messages.
+      // The C side calls into this via EM_JS wrappers.
+      function initDwasmNet(Module) {
+        const state = {
+          room: null,
+          connecting: false,
+          connected: false,
+          sendQueue: [],
+        };
+
+        function getGameIdFromUrl() {
+          try {
+            return new URLSearchParams(window.location.search).get('g');
+          } catch (_) {
+            return null;
+          }
+        }
+
+        async function join(serverArg) {
+          // serverArg may be either:
+          //  - full join URL: https://api.synapse.beebs.dev/room/<uuid>/join
+          //  - room UUID: <uuid>
+          let arg = '';
+          if (serverArg !== undefined && serverArg !== null) {
+            arg = String(serverArg);
+          }
+          if (!arg) {
+            const fromUrl = getGameIdFromUrl();
+            if (fromUrl) arg = fromUrl;
+          }
+          if (!arg) {
+            throw new Error('missing game id (use ?g=<uuid> or pass -net <uuid>)');
+          }
+
+          const joinUrl = (arg.startsWith('http://') || arg.startsWith('https://'))
+            ? arg
+            : `https://api.synapse.beebs.dev/room/${arg}/join`;
+
+          const resp = await fetch(joinUrl, { method: 'GET' });
+          if (!resp.ok) {
+            throw new Error(`join failed: ${resp.status} ${resp.statusText}`);
+          }
+          const json = await resp.json();
+          if (!json || typeof json.token !== 'string' || typeof json.url !== 'string') {
+            throw new Error('join response missing token/url');
+          }
+          return { token: json.token, url: json.url };
+        }
+
+        function deliverToWasm(payload) {
+          try {
+            const ptr = Module._wasm_net_get_rx_buf(payload.length);
+            if (!ptr) return;
+            Module.HEAPU8.set(payload, ptr);
+            Module._wasm_net_commit_rx(payload.length);
+          } catch (e) {
+            console.warn('deliverToWasm failed:', e);
+          }
+        }
+
+        function canUseLiveKit() {
+          return (typeof LiveKitClient === 'object') && LiveKitClient && LiveKitClient.Room;
+        }
+
+        Module.dwasmNet = {
+          connect: async (serverArg) => {
+            if (state.connected || state.connecting) return;
+            state.connecting = true;
+            try {
+              if (!canUseLiveKit()) {
+                throw new Error('LiveKitClient not loaded');
+              }
+
+              const { token, url } = await join(serverArg);
+              const room = new LiveKitClient.Room({
+                adaptiveStream: false,
+                dynacast: false,
+              });
+
+              room
+                .on(LiveKitClient.RoomEvent.DataReceived, (payload, participant, kind) => {
+                  // payload is a Uint8Array
+                  deliverToWasm(payload);
+                })
+                .on(LiveKitClient.RoomEvent.Disconnected, () => {
+                  state.connected = false;
+                  state.room = null;
+                });
+
+              await room.connect(url, token, { autoSubscribe: false });
+              state.room = room;
+              state.connected = true;
+              console.info('LiveKit connected');
+
+              // Flush queued datagrams.
+              if (state.sendQueue.length) {
+                const q = state.sendQueue;
+                state.sendQueue = [];
+                for (const msg of q) {
+                  try {
+                    room.localParticipant.publishData(msg, LiveKitClient.DataPacket_Kind.LOSSY);
+                  } catch (e) {
+                    // If it fails, drop (UDP semantics).
+                  }
+                }
+              }
+            } catch (e) {
+              const msg = (e && (e.stack || e.message)) ? (e.stack || e.message) : e;
+              console.error('LiveKit connect failed:', msg);
+            } finally {
+              state.connecting = false;
+            }
+          },
+
+          disconnect: async () => {
+            try {
+              if (state.room) {
+                state.room.disconnect();
+              }
+            } finally {
+              state.room = null;
+              state.connected = false;
+              state.connecting = false;
+              state.sendQueue = [];
+            }
+          },
+
+          send: (payload) => {
+            // payload: Uint8Array
+            if (!payload || payload.length === 0) return;
+            if (!state.connected || !state.room) {
+              // Queue until connected; cap queue size to avoid runaway memory use.
+              if (state.sendQueue.length < 256) {
+                state.sendQueue.push(payload);
+              }
+              return;
+            }
+            try {
+              state.room.localParticipant.publishData(payload, LiveKitClient.DataPacket_Kind.LOSSY);
+            } catch (e) {
+              // Drop on error (UDP semantics).
+            }
+          },
+        };
+      }
+
       var Module = {
         _canLockPointer: true,
+        preRun: [() => {
+          // Initialize the JS networking bridge early so C can call it during startup.
+          if (!Module.dwasmNet) initDwasmNet(Module);
+
+          // If ?g=<uuid> is present, proactively connect to LiveKit.
+          // The engine will also call connect() when -net is set; connect() is idempotent.
+          try {
+            const g = new URLSearchParams(window.location.search).get('g');
+            if (g) {
+              Module.dwasmNet.connect(g);
+            }
+          } catch (_) {
+            // Ignore malformed query strings.
+          }
+        }],
         print: (function() {
           outputElement.value = ''; // clear browser cache
           return (...args) => {
@@ -177,8 +366,10 @@
         },
         onRuntimeInitialized: () => {
           outputElement.style.display = 'block';
+          // preRun initializes networking; keep this as a safety net only.
+          if (!Module.dwasmNet) initDwasmNet(Module);
         },
-        arguments: window.location.search.length > 1 ? window.location.search.substr(1).split('&') : []
+        arguments: computeModuleArgs()
       };
       Module.setStatus('Downloading...');
       window.onerror = () => {

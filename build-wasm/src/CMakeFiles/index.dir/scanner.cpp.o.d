@@ -1,0 +1,32 @@
+src/CMakeFiles/index.dir/scanner.cpp.o: \
+  /home/thavlik/Repositories/Dwasm/src/scanner.cpp \
+  /usr/share/emscripten/cache/sysroot/include/compat/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/__config \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/__config_site \
+  /usr/share/emscripten/cache/sysroot/include/pthread.h \
+  /usr/share/emscripten/cache/sysroot/include/stdlib.h \
+  /usr/share/emscripten/cache/sysroot/include/features.h \
+  /usr/share/emscripten/cache/sysroot/include/bits/alltypes.h \
+  /usr/share/emscripten/cache/sysroot/include/alloca.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/stdio.h \
+  /usr/share/emscripten/cache/sysroot/include/stdio.h \
+  /usr/share/emscripten/cache/sysroot/include/wasi/api.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/stddef.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stddef.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/__stddef_max_align_t.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/__nullptr \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/stdint.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/bits/stdint.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/string.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/string.h \
+  /usr/share/emscripten/cache/sysroot/include/string.h \
+  /usr/share/emscripten/cache/sysroot/include/strings.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/stdarg.h \
+  /usr/lib/llvm-15/lib/clang/15.0.7/include/stdarg.h \
+  /usr/share/emscripten/cache/sysroot/include/compat/ctype.h \
+  /usr/share/emscripten/cache/sysroot/include/c++/v1/ctype.h \
+  /usr/share/emscripten/cache/sysroot/include/ctype.h \
+  /home/thavlik/Repositories/Dwasm/src/scanner.h

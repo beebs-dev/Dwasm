@@ -1,0 +1,480 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CMakeDetermineSystem.cmake:228 (message)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      The target system is: Emscripten - 1 - x86
+      The host system is: Linux - 6.14.0-37-generic - x86_64
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "cmake/TargetArch.cmake:133 (try_run)"
+      - "CMakeLists.txt:34 (target_architecture)"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeTmp"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "compile_result_unused"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_d4643/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_d4643.dir/build.make CMakeFiles/cmTC_d4643.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeTmp'
+        Building C object CMakeFiles/cmTC_d4643.dir/arch.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_d4643.dir/arch.c.o -MF CMakeFiles/cmTC_d4643.dir/arch.c.o.d -o CMakeFiles/cmTC_d4643.dir/arch.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/arch.c
+        /home/thavlik/Repositories/Dwasm/build-wasm/arch.c:40:2: error: cmake_ARCH unknown
+        #error cmake_ARCH unknown
+         ^
+        1 error generated.
+        emcc: error: '/usr/bin/clang-15 -target wasm32-unknown-emscripten -DEMSCRIPTEN -D__EMSCRIPTEN_major__=3 -D__EMSCRIPTEN_minor__=1 -D__EMSCRIPTEN_tiny__=6 -fignore-exceptions -fvisibility=default -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D_LIBCPP_ABI_VERSION=2 -fno-threadsafe-statics -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL --sysroot=/usr/share/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -MD -MT CMakeFiles/cmTC_d4643.dir/arch.c.o -MF CMakeFiles/cmTC_d4643.dir/arch.c.o.d -c /home/thavlik/Repositories/Dwasm/build-wasm/arch.c -o CMakeFiles/cmTC_d4643.dir/arch.c.o' failed (returned 1)
+        gmake[1]: *** [CMakeFiles/cmTC_d4643.dir/build.make:79: CMakeFiles/cmTC_d4643.dir/arch.c.o] Error 1
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeTmp'
+        gmake: *** [Makefile:127: cmTC_d4643/fast] Error 2
+        
+      exitCode: 2
+    runResult:
+      variable: "run_result_unused"
+      cached: true
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:53 (check_symbol_exists)"
+    checks:
+      - "Looking for stricmp"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_STRICMP"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_6ab6d/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_6ab6d.dir/build.make CMakeFiles/cmTC_6ab6d.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282'
+        Building C object CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282/CheckSymbolExists.c
+        /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282/CheckSymbolExists.c:8:19: error: use of undeclared identifier 'stricmp'
+          return ((int*)(&stricmp))[argc];
+                          ^
+        1 error generated.
+        emcc: error: '/usr/bin/clang-15 -target wasm32-unknown-emscripten -DEMSCRIPTEN -D__EMSCRIPTEN_major__=3 -D__EMSCRIPTEN_minor__=1 -D__EMSCRIPTEN_tiny__=6 -fignore-exceptions -fvisibility=default -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D_LIBCPP_ABI_VERSION=2 -fno-threadsafe-statics -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL --sysroot=/usr/share/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -MD -MT CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o.d -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282/CheckSymbolExists.c -o CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o' failed (returned 1)
+        gmake[1]: *** [CMakeFiles/cmTC_6ab6d.dir/build.make:79: CMakeFiles/cmTC_6ab6d.dir/CheckSymbolExists.c.o] Error 1
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-oej282'
+        gmake: *** [Makefile:127: cmTC_6ab6d/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:57 (check_symbol_exists)"
+    checks:
+      - "Looking for strnicmp"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_STRNICMP"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_15cce/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_15cce.dir/build.make CMakeFiles/cmTC_15cce.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC'
+        Building C object CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC/CheckSymbolExists.c
+        /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC/CheckSymbolExists.c:8:19: error: use of undeclared identifier 'strnicmp'; did you mean 'strncmp'?
+          return ((int*)(&strnicmp))[argc];
+                          ^~~~~~~~
+                          strncmp
+        /usr/share/emscripten/cache/sysroot/include/string.h:38:5: note: 'strncmp' declared here
+        int strncmp (const char *, const char *, size_t);
+            ^
+        1 error generated.
+        emcc: error: '/usr/bin/clang-15 -target wasm32-unknown-emscripten -DEMSCRIPTEN -D__EMSCRIPTEN_major__=3 -D__EMSCRIPTEN_minor__=1 -D__EMSCRIPTEN_tiny__=6 -fignore-exceptions -fvisibility=default -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D_LIBCPP_ABI_VERSION=2 -fno-threadsafe-statics -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL --sysroot=/usr/share/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -MD -MT CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o.d -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC/CheckSymbolExists.c -o CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o' failed (returned 1)
+        gmake[1]: *** [CMakeFiles/cmTC_15cce.dir/build.make:79: CMakeFiles/cmTC_15cce.dir/CheckSymbolExists.c.o] Error 1
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-Vo07mC'
+        gmake: *** [Makefile:127: cmTC_15cce/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:62 (check_symbol_exists)"
+    checks:
+      - "Looking for getopt"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-i0IPqI"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-i0IPqI"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_GETOPT"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-i0IPqI'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_436f2/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_436f2.dir/build.make CMakeFiles/cmTC_436f2.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-i0IPqI'
+        Building C object CMakeFiles/cmTC_436f2.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_436f2.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_436f2.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_436f2.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-i0IPqI/CheckSymbolExists.c
+        Linking C executable cmTC_436f2.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_436f2.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_436f2.dir/objects1.rsp -o cmTC_436f2.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-i0IPqI'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:63 (check_symbol_exists)"
+    checks:
+      - "Looking for mmap"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-BX7qxv"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-BX7qxv"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_MMAP"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-BX7qxv'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_a15d1/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_a15d1.dir/build.make CMakeFiles/cmTC_a15d1.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-BX7qxv'
+        Building C object CMakeFiles/cmTC_a15d1.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_a15d1.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_a15d1.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_a15d1.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-BX7qxv/CheckSymbolExists.c
+        Linking C executable cmTC_a15d1.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a15d1.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_a15d1.dir/objects1.rsp -o cmTC_a15d1.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-BX7qxv'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:64 (check_symbol_exists)"
+    checks:
+      - "Looking for CreateFileMapping"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_CREATE_FILE_MAPPING"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_901fb/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_901fb.dir/build.make CMakeFiles/cmTC_901fb.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO'
+        Building C object CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO/CheckSymbolExists.c
+        /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO/CheckSymbolExists.c:2:10: fatal error: 'windows.h' file not found
+        #include <windows.h>
+                 ^~~~~~~~~~~
+        1 error generated.
+        emcc: error: '/usr/bin/clang-15 -target wasm32-unknown-emscripten -DEMSCRIPTEN -D__EMSCRIPTEN_major__=3 -D__EMSCRIPTEN_minor__=1 -D__EMSCRIPTEN_tiny__=6 -fignore-exceptions -fvisibility=default -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D_LIBCPP_ABI_VERSION=2 -fno-threadsafe-statics -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL --sysroot=/usr/share/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -MD -MT CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o.d -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO/CheckSymbolExists.c -o CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o' failed (returned 1)
+        gmake[1]: *** [CMakeFiles/cmTC_901fb.dir/build.make:79: CMakeFiles/cmTC_901fb.dir/CheckSymbolExists.c.o] Error 1
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-41lPeO'
+        gmake: *** [Makefile:127: cmTC_901fb/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:68 (check_symbol_exists)"
+    checks:
+      - "Looking for sched_setaffinity"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aHQ4cg"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aHQ4cg"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_SCHED_SETAFFINITY"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aHQ4cg'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_8f766/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_8f766.dir/build.make CMakeFiles/cmTC_8f766.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aHQ4cg'
+        Building C object CMakeFiles/cmTC_8f766.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc -D_GNU_SOURCE   -MD -MT CMakeFiles/cmTC_8f766.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_8f766.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_8f766.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aHQ4cg/CheckSymbolExists.c
+        Linking C executable cmTC_8f766.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8f766.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_8f766.dir/objects1.rsp -o cmTC_8f766.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aHQ4cg'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:74 (check_symbol_exists)"
+    checks:
+      - "Looking for usleep"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-C13srK"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-C13srK"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_USLEEP"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-C13srK'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_c808d/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_c808d.dir/build.make CMakeFiles/cmTC_c808d.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-C13srK'
+        Building C object CMakeFiles/cmTC_c808d.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_c808d.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_c808d.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_c808d.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-C13srK/CheckSymbolExists.c
+        Linking C executable cmTC_c808d.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c808d.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_c808d.dir/objects1.rsp -o cmTC_c808d.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-C13srK'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:75 (check_symbol_exists)"
+    checks:
+      - "Looking for strsignal"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-55W3Pm"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-55W3Pm"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_STRSIGNAL"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-55W3Pm'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_e0c24/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_e0c24.dir/build.make CMakeFiles/cmTC_e0c24.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-55W3Pm'
+        Building C object CMakeFiles/cmTC_e0c24.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_e0c24.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_e0c24.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_e0c24.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-55W3Pm/CheckSymbolExists.c
+        Linking C executable cmTC_e0c24.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e0c24.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_e0c24.dir/objects1.rsp -o cmTC_e0c24.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-55W3Pm'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/usr/share/cmake-3.28/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:76 (check_symbol_exists)"
+    checks:
+      - "Looking for mkstemp"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aC69Cl"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aC69Cl"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_MKSTEMP"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aC69Cl'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_22b3e/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_22b3e.dir/build.make CMakeFiles/cmTC_22b3e.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aC69Cl'
+        Building C object CMakeFiles/cmTC_22b3e.dir/CheckSymbolExists.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_22b3e.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_22b3e.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_22b3e.dir/CheckSymbolExists.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aC69Cl/CheckSymbolExists.c
+        Linking C executable cmTC_22b3e.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_22b3e.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_22b3e.dir/objects1.rsp -o cmTC_22b3e.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-aC69Cl'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "CMakeLists.txt:80 (check_include_file)"
+    checks:
+      - "Looking for sys/wait.h"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-vkRn99"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-vkRn99"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_SYS_WAIT_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-vkRn99'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4b154/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_4b154.dir/build.make CMakeFiles/cmTC_4b154.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-vkRn99'
+        Building C object CMakeFiles/cmTC_4b154.dir/CheckIncludeFile.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_4b154.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_4b154.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_4b154.dir/CheckIncludeFile.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-vkRn99/CheckIncludeFile.c
+        Linking C executable cmTC_4b154.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4b154.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_4b154.dir/objects1.rsp -o cmTC_4b154.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-vkRn99'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "CMakeLists.txt:81 (check_include_file)"
+    checks:
+      - "Looking for unistd.h"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-g0DkjM"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-g0DkjM"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_UNISTD_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-g0DkjM'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_1982b/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_1982b.dir/build.make CMakeFiles/cmTC_1982b.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-g0DkjM'
+        Building C object CMakeFiles/cmTC_1982b.dir/CheckIncludeFile.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_1982b.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_1982b.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_1982b.dir/CheckIncludeFile.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-g0DkjM/CheckIncludeFile.c
+        Linking C executable cmTC_1982b.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1982b.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_1982b.dir/objects1.rsp -o cmTC_1982b.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-g0DkjM'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "CMakeLists.txt:82 (check_include_file)"
+    checks:
+      - "Looking for asm/byteorder.h"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_ASM_BYTEORDER_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_d966d/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_d966d.dir/build.make CMakeFiles/cmTC_d966d.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9'
+        Building C object CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9/CheckIncludeFile.c
+        /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9/CheckIncludeFile.c:1:10: fatal error: 'asm/byteorder.h' file not found
+        #include <asm/byteorder.h>
+                 ^~~~~~~~~~~~~~~~~
+        1 error generated.
+        emcc: error: '/usr/bin/clang-15 -target wasm32-unknown-emscripten -DEMSCRIPTEN -D__EMSCRIPTEN_major__=3 -D__EMSCRIPTEN_minor__=1 -D__EMSCRIPTEN_tiny__=6 -fignore-exceptions -fvisibility=default -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -D_LIBCPP_ABI_VERSION=2 -fno-threadsafe-statics -Werror=implicit-function-declaration -Xclang -iwithsysroot/include/SDL --sysroot=/usr/share/emscripten/cache/sysroot -Xclang -iwithsysroot/include/compat -MD -MT CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o.d -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9/CheckIncludeFile.c -o CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o' failed (returned 1)
+        gmake[1]: *** [CMakeFiles/cmTC_d966d.dir/build.make:79: CMakeFiles/cmTC_d966d.dir/CheckIncludeFile.c.o] Error 1
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-SWVly9'
+        gmake: *** [Makefile:127: cmTC_d966d/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "CMakeLists.txt:83 (check_include_file)"
+    checks:
+      - "Looking for dirent.h"
+    directories:
+      source: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-1mP065"
+      binary: "/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-1mP065"
+    cmakeVariables:
+      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND"
+      CMAKE_C_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/thavlik/Repositories/Dwasm/cmake"
+    buildResult:
+      variable: "HAVE_DIRENT_H"
+      cached: true
+      stdout: |
+        Change Dir: '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-1mP065'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_d7593/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_d7593.dir/build.make CMakeFiles/cmTC_d7593.dir/build
+        gmake[1]: Entering directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-1mP065'
+        Building C object CMakeFiles/cmTC_d7593.dir/CheckIncludeFile.c.o
+        /usr/bin/emcc    -MD -MT CMakeFiles/cmTC_d7593.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_d7593.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_d7593.dir/CheckIncludeFile.c.o -c /home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-1mP065/CheckIncludeFile.c
+        Linking C executable cmTC_d7593.js
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d7593.dir/link.txt --verbose=1
+        /usr/bin/emcc @CMakeFiles/cmTC_d7593.dir/objects1.rsp -o cmTC_d7593.js 
+        gmake[1]: Leaving directory '/home/thavlik/Repositories/Dwasm/build-wasm/CMakeFiles/CMakeScratch/TryCompile-1mP065'
+        
+      exitCode: 0
+...

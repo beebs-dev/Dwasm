@@ -35,14 +35,35 @@
 #endif
 
 #ifdef USE_SDL_NET
- #include "SDL_net.h"
- #define UDP_SOCKET UDPsocket
- #define UDP_PACKET UDPpacket
- #define AF_INET
- #define UDP_CHANNEL int
- extern UDP_SOCKET udp_socket;
+        #ifdef __EMSCRIPTEN__
+                #include "SDL.h"
+                typedef struct {
+                        Uint32 host;
+                        Uint16 port;
+                } IPaddress;
+                typedef int UDPsocket;
+                typedef struct {
+                        int channel;
+                        IPaddress address;
+                        int len;
+                        int maxlen;
+                        Uint8 *data;
+                } UDPpacket;
+                #define UDP_SOCKET UDPsocket
+                #define UDP_PACKET UDPpacket
+                #define AF_INET
+                #define UDP_CHANNEL int
+                extern UDP_SOCKET udp_socket;
+        #else
+                #include "SDL_net.h"
+                #define UDP_SOCKET UDPsocket
+                #define UDP_PACKET UDPpacket
+                #define AF_INET
+                #define UDP_CHANNEL int
+                extern UDP_SOCKET udp_socket;
+        #endif
 #else
- #define UDP_CHANNEL struct sockaddr
+        #define UDP_CHANNEL struct sockaddr
 #endif
 
 #ifndef IPPORT_RESERVED

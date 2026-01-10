@@ -209,6 +209,12 @@ set(SDLDOOM_SOURCES
     SDL/i_video.c
 )
 
+if(EMSCRIPTEN)
+    # Replace UDP/SDL_net backend with a browser networking backend.
+    list(REMOVE_ITEM SDLDOOM_SOURCES SDL/i_network.c)
+    list(APPEND SDLDOOM_SOURCES WASM/i_network.c)
+endif()
+
 set(PCSOUND_SOURCES
     PCSOUND/pcsound.c
     PCSOUND/pcsound.h
