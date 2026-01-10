@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Dwasm</title>
-    <script src="https://unpkg.com/livekit-client/dist/livekit-client.umd.min.js"></script>
+    <script src="livekit-client.umd.js"></script>
     <style>
       body {
         background-color: black;
@@ -123,6 +123,8 @@
           sendQueue: [],
         };
 
+        const LIVEKIT_UMD_URL = 'livekit-client.umd.js';
+
         function getGameIdFromUrl() {
           try {
             return new URLSearchParams(window.location.search).get('g');
@@ -173,8 +175,52 @@
           }
         }
 
-        function canUseLiveKit() {
-          return (typeof LiveKitClient === 'object') && LiveKitClient && LiveKitClient.Room;
+        function getLiveKit() {
+          return (typeof window !== 'undefined')
+            ? (window.LiveKitClient || window.LivekitClient)
+            : null;
+        }
+
+        function delay(ms) {
+          return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        async function ensureLiveKitLoaded(timeoutMs = 15000) {
+          // If already present, fast-path.
+          let lk = getLiveKit();
+          if (lk && lk.Room) return lk;
+
+          // If the script tag exists, wait a bit for it to execute.
+          const deadline = Date.now() + timeoutMs;
+
+          // Try to inject the UMD script if it's not already on the page.
+          try {
+            const hasScript = Array.from(document.getElementsByTagName('script'))
+              .some((s) => (s && s.src && s.src.includes('livekit-client.umd')));
+
+            if (!hasScript) {
+              await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = LIVEKIT_UMD_URL;
+                s.async = true;
+                s.crossOrigin = 'anonymous';
+                s.onload = () => resolve();
+                s.onerror = (e) => reject(new Error('failed to load LiveKit UMD script'));
+                document.head.appendChild(s);
+              });
+            }
+          } catch (_) {
+            // Ignore injection failures; we'll still poll for the global.
+          }
+
+          // Poll for the global to appear (covers both normal loading and injection).
+          while (Date.now() < deadline) {
+            lk = getLiveKit();
+            if (lk && lk.Room) return lk;
+            await delay(50);
+          }
+
+          throw new Error('LiveKit client not available (script blocked or not yet loaded)');
         }
 
         Module.dwasmNet = {
@@ -182,22 +228,20 @@
             if (state.connected || state.connecting) return;
             state.connecting = true;
             try {
-              if (!canUseLiveKit()) {
-                throw new Error('LiveKitClient not loaded');
-              }
+              const LK = await ensureLiveKitLoaded();
 
               const { token, url } = await join(serverArg);
-              const room = new LiveKitClient.Room({
+              const room = new LK.Room({
                 adaptiveStream: false,
                 dynacast: false,
               });
 
               room
-                .on(LiveKitClient.RoomEvent.DataReceived, (payload, participant, kind) => {
+                .on(LK.RoomEvent.DataReceived, (payload, participant, kind) => {
                   // payload is a Uint8Array
                   deliverToWasm(payload);
                 })
-                .on(LiveKitClient.RoomEvent.Disconnected, () => {
+                .on(LK.RoomEvent.Disconnected, () => {
                   state.connected = false;
                   state.room = null;
                 });
@@ -213,7 +257,7 @@
                 state.sendQueue = [];
                 for (const msg of q) {
                   try {
-                    room.localParticipant.publishData(msg, LiveKitClient.DataPacket_Kind.LOSSY);
+                    room.localParticipant.publishData(msg, LK.DataPacket_Kind.LOSSY);
                   } catch (e) {
                     // If it fails, drop (UDP semantics).
                   }
@@ -251,7 +295,9 @@
               return;
             }
             try {
-              state.room.localParticipant.publishData(payload, LiveKitClient.DataPacket_Kind.LOSSY);
+              const LK = getLiveKit();
+              const kind = (LK && LK.DataPacket_Kind && LK.DataPacket_Kind.LOSSY) ? LK.DataPacket_Kind.LOSSY : 1;
+              state.room.localParticipant.publishData(payload, kind);
             } catch (e) {
               // Drop on error (UDP semantics).
             }

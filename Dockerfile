@@ -9,6 +9,7 @@ FROM emscripten/emsdk:${EMSDK_TAG} AS build
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		cmake \
+		curl \
 		git \
 		make \
 		ninja-build \
@@ -64,7 +65,8 @@ RUN mkdir -p build \
 	&& emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DGL4ES_PATH=/opt/gl4es \
 	&& cmake --build . -j"$(nproc)" \
 	&& mkdir -p /out \
-	&& cp -f index.html index.js index.data index.wasm /out/
+	&& cp -f index.html index.js index.data index.wasm /out/ \
+	&& curl -fsSL "https://unpkg.com/livekit-client@2.16.1/dist/livekit-client.umd.js" -o /out/livekit-client.umd.js
 
 # Export stage: use BuildKit output, e.g.
 #   docker build --target export -o ./dist .
