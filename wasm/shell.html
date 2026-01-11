@@ -108,7 +108,8 @@
         }
 
         // Drop any existing g=... token from the legacy raw args.
-        const filtered = rawArgs.filter((a) => !a.startsWith('g='));
+        // Also drop name=... which is meant for the join API, not the engine.
+        const filtered = rawArgs.filter((a) => !a.startsWith('g=') && !a.startsWith('name='));
         filtered.push('-net', gameId);
         return filtered;
       }
@@ -128,6 +129,17 @@
         function getGameIdFromUrl() {
           try {
             return new URLSearchParams(window.location.search).get('g');
+          } catch (_) {
+            return null;
+          }
+        }
+
+        function getNameFromUrl() {
+          try {
+            const v = new URLSearchParams(window.location.search).get('name');
+            if (!v) return null;
+            const s = String(v).trim();
+            return s ? s : null;
           } catch (_) {
             return null;
           }
@@ -153,7 +165,21 @@
             ? arg
             : `https://api.synapse.beebs.dev/room/${arg}/join`;
 
-          const resp = await fetch(joinUrl, { method: 'GET' });
+          // If ?name=<name> is present, forward it to the join API.
+          // This lets the backend mint a token with the chosen participant name.
+          let finalJoinUrl = joinUrl;
+          try {
+            const name = getNameFromUrl();
+            if (name) {
+              const u = new URL(joinUrl);
+              u.searchParams.set('name', name);
+              finalJoinUrl = u.toString();
+            }
+          } catch (_) {
+            // If URL parsing fails for any reason, fall back to the raw joinUrl.
+          }
+
+          const resp = await fetch(finalJoinUrl, { method: 'GET' });
           if (!resp.ok) {
             throw new Error(`join failed: ${resp.status} ${resp.statusText}`);
           }
@@ -235,16 +261,9 @@
             console.warn('publishData(data, kind, options) failed; falling back:', e);
           }
 
-          // Last-resort fallback: broadcast lossy without topic.
-          try {
-            if (LK.DataPacket_Kind && LK.DataPacket_Kind.LOSSY !== undefined) {
-              room.localParticipant.publishData(bytes, LK.DataPacket_Kind.LOSSY);
-            } else {
-              room.localParticipant.publishData(bytes);
-            }
-          } catch (_) {
-            // Drop on error (UDP semantics).
-          }
+          // No further fallback.
+          // If we can't send as lossy+topic, drop (UDP semantics) rather than
+          // accidentally sending reliable/ordered (causes head-of-line blocking and jank).
         }
 
         function getLiveKit() {
@@ -352,7 +371,7 @@
                 state.sendQueue = [];
                 for (const msg of q) {
                   try {
-                    room.localParticipant.publishData(msg, LK.DataPacket_Kind.LOSSY);
+                    publishUdp(room, msg);
                   } catch (e) {
                     // If it fails, drop (UDP semantics).
                   }
