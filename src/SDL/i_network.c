@@ -74,6 +74,29 @@ size_t sentbytes, recvdbytes;
 
 UDP_PACKET *udp_packet;
 
+static int dorch_net_debug_enabled(void)
+{
+  const char *v = getenv("DORCH_SERVER_NET_DEBUG");
+  return (v && *v);
+}
+
+static void dorch_fmt_ip(char *out, size_t outsz, const IPaddress *addr)
+{
+  /* IPaddress.host/port are stored in network byte order. */
+  Uint32 host = SDL_SwapBE32(addr->host);
+  Uint16 port = SDL_SwapBE16(addr->port);
+  snprintf(
+    out,
+    outsz,
+    "%u.%u.%u.%u:%u",
+    (unsigned)((host >> 24) & 0xff),
+    (unsigned)((host >> 16) & 0xff),
+    (unsigned)((host >> 8) & 0xff),
+    (unsigned)(host & 0xff),
+    (unsigned)port
+  );
+}
+
 /* I_ShutdownNetwork
  *
  * Shutdown the network code
@@ -203,7 +226,13 @@ void I_CloseSocket(UDP_SOCKET sock)
 UDP_CHANNEL I_RegisterPlayer(IPaddress *ipaddr)
 {
   static int freechannel;
-  return(SDLNet_UDP_Bind(udp_socket, freechannel++, ipaddr));
+  int ch = SDLNet_UDP_Bind(udp_socket, freechannel++, ipaddr);
+  if (dorch_net_debug_enabled()) {
+    char tmp[64];
+    dorch_fmt_ip(tmp, sizeof(tmp), ipaddr);
+    fprintf(stderr, "[dorch-net] bind peer=%s -> channel=%d\n", tmp, ch);
+  }
+  return ch;
 }
 
 void I_UnRegisterPlayer(UDP_CHANNEL channel)
@@ -250,7 +279,35 @@ size_t I_GetPacket(packet_header_t* buffer, size_t buflen)
     byte psum = ChecksumPacket(buffer, len); // https://logicaltrust.net/blog/2019/10/prboom1.html
 /*    fprintf(stderr, "recvlen = %u, stolen = %u, csum = %u, psum = %u\n",
   udp_packet->len, len, checksum, psum); */
-    if (psum == checksum) return len;
+    if (psum == checksum) {
+      if (dorch_net_debug_enabled()) {
+        char tmp[64];
+        dorch_fmt_ip(tmp, sizeof(tmp), &sentfrom_addr);
+        fprintf(
+          stderr,
+          "[dorch-net] rx from=%s ch=%d len=%u type=%u csum=%u\n",
+          tmp,
+          (int)sentfrom,
+          (unsigned)len,
+          (unsigned)buffer->type,
+          (unsigned)checksum
+        );
+      }
+      return len;
+    } else if (dorch_net_debug_enabled()) {
+      char tmp[64];
+      dorch_fmt_ip(tmp, sizeof(tmp), &sentfrom_addr);
+      fprintf(
+        stderr,
+        "[dorch-net] drop bad checksum from=%s ch=%d len=%u type=%u want=%u got=%u\n",
+        tmp,
+        (int)sentfrom,
+        (unsigned)len,
+        (unsigned)buffer->type,
+        (unsigned)checksum,
+        (unsigned)psum
+      );
+    }
   }
   return 0;
 }
@@ -266,7 +323,30 @@ void I_SendPacketTo(packet_header_t* packet, size_t len, UDP_CHANNEL *to)
 {
   packet->checksum = ChecksumPacket(packet, len);
   memcpy(udp_packet->data, packet, udp_packet->len = len);
-  SDLNet_UDP_Send(udp_socket, *to, udp_packet);
+  {
+    int rc = SDLNet_UDP_Send(udp_socket, *to, udp_packet);
+    if (dorch_net_debug_enabled()) {
+      IPaddress *peer = SDLNet_UDP_GetPeerAddress(udp_socket, *to);
+      char tmp[64];
+      if (peer) {
+        dorch_fmt_ip(tmp, sizeof(tmp), peer);
+      } else {
+        snprintf(tmp, sizeof(tmp), "(unknown)");
+      }
+      fprintf(
+        stderr,
+        "[dorch-net] tx to=%s ch=%d len=%u type=%u rc=%d\n",
+        tmp,
+        (int)(*to),
+        (unsigned)len,
+        (unsigned)packet->type,
+        rc
+      );
+      if (rc == 0) {
+        fprintf(stderr, "[dorch-net] tx failed: %s\n", SDLNet_GetError());
+      }
+    }
+  }
 }
 
 void I_PrintAddress(FILE* fp, UDP_CHANNEL *addr)

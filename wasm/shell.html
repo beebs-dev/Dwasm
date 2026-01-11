@@ -168,7 +168,16 @@
           try {
             const ptr = Module._wasm_net_get_rx_buf(payload.length);
             if (!ptr) return;
-            Module.HEAPU8.set(payload, ptr);
+
+            // Do NOT access Module.HEAPU8 here.
+            // When HEAPU8 isn't exported, Emscripten defines it as an accessor that aborts.
+            // Instead, derive a view from the module's WebAssembly.Memory.
+            const mem = Module.wasmMemory || Module['wasmMemory'] || (Module.asm || Module['asm'])?.memory;
+            if (!mem || !mem.buffer) {
+              throw new Error('WASM memory not available for RX copy');
+            }
+            new Uint8Array(mem.buffer).set(payload, ptr);
+
             Module._wasm_net_commit_rx(payload.length);
           } catch (e) {
             console.warn('deliverToWasm failed:', e);

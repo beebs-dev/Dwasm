@@ -271,8 +271,12 @@ else()
             add_definitions(-DDWASM_ASYNCIFY=1)
         endif()
 
-        # Needed so shell.html can call Module.stackTrace() in onAbort.
-        set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -sEXPORTED_RUNTIME_METHODS=['stackTrace']")
+        # shell.html / WASM net bridge needs access to these runtime helpers.
+        # - stackTrace: used by shell.html onAbort handler
+        # - UTF8ToString: used by EM_JS glue (wasm_net_js_connect)
+        # - HEAPU8: used by EM_JS glue and deliverToWasm() to copy payload bytes into WASM memory
+        # - wasmMemory: used by deliverToWasm() to get WebAssembly.Memory without touching HEAP views
+        set(WASM_DIAGNOSTIC_FLAGS "${WASM_DIAGNOSTIC_FLAGS} -sEXPORTED_RUNTIME_METHODS=['stackTrace','UTF8ToString','HEAPU8','wasmMemory']")
 
         if (BUILD_GL AND GL4ES_PATH)
             set(CMAKE_C_FLAGS
